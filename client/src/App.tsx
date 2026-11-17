@@ -1,114 +1,104 @@
-import { useQuery } from "@tanstack/react-query";
-import { api } from "./lib/api";
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-interface HealthResponse {
-  success: boolean;
-  message: string;
-  data: {
-    api: string;
-    database: string;
-    environment: string;
-  };
-}
+// Layouts
+import { PublicLayout } from './layouts/PublicLayout';
+import { PatientLayout } from './layouts/PatientLayout';
+import { StaffLayout } from './layouts/StaffLayout';
+import { SuperAdminLayout } from './layouts/SuperAdminLayout';
 
-function App() {
-  const healthQuery = useQuery({
-    queryKey: ["api-health"],
+// Common
+import { DevToolbar } from './components/common/DevToolbar';
 
-    queryFn: async () => {
-      const response = await api.get<HealthResponse>("/health");
-      return response.data;
-    },
+// Public Pages
+import { HomePage } from './pages/public/HomePage';
+import { ServicesPage } from './pages/public/ServicesPage';
+import { DoctorsPage } from './pages/public/DoctorsPage';
+import { ContactPage } from './pages/public/ContactPage';
+import { AboutPage } from './pages/public/AboutPage';
+import { FAQPage } from './pages/public/FAQPage';
+import { BlogPage } from './pages/public/BlogPage';
+import { BookingPage } from './pages/public/BookingPage';
 
-    retry: 1,
-    refetchOnWindowFocus: false,
-  });
+// Patient Pages
+import { PatientDashboardPage } from './pages/patient/PatientDashboardPage';
+import { PatientPrescriptionsPage } from './pages/patient/PatientPrescriptionsPage';
+import { PatientFamilyPage } from './pages/patient/PatientFamilyPage';
+import { PatientConsentsPage } from './pages/patient/PatientConsentsPage';
 
+// Staff Pages
+import { ReceptionQueuePage } from './pages/staff/ReceptionQueuePage';
+import { ReceptionEnquiriesPage } from './pages/staff/ReceptionEnquiriesPage';
+import { DoctorQueuePage } from './pages/staff/DoctorQueuePage';
+import { DoctorSchedulePage } from './pages/staff/DoctorSchedulePage';
+import { ClinicAdminDashboardPage } from './pages/staff/ClinicAdminDashboardPage';
+import { ClinicAdminCatalogPage } from './pages/staff/ClinicAdminCatalogPage';
+import { ClinicAdminCMSPage } from './pages/staff/ClinicAdminCMSPage';
+import { ClinicAdminSettingsPage } from './pages/staff/ClinicAdminSettingsPage';
+import { ClinicAdminStaffPage } from './pages/staff/ClinicAdminStaffPage';
+
+// Super Admin Pages
+import { SuperAdminClinicsPage } from './pages/admin/SuperAdminClinicsPage';
+import { SuperAdminAnalyticsPage } from './pages/admin/SuperAdminAnalyticsPage';
+import { SuperAdminPlansPage } from './pages/admin/SuperAdminPlansPage';
+
+export default function App() {
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
-      <header className="border-b border-slate-200 bg-white">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-          <a href="/" className="text-xl font-bold text-blue-700">
-            MediBook
-          </a>
+    <BrowserRouter>
+      <Routes>
+        {/* 1. Public Clinic Website */}
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/doctors" element={<DoctorsPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/faq" element={<FAQPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/book" element={<BookingPage />} />
+        </Route>
 
-          <div className="flex items-center gap-4">
-            <a
-              href="/login"
-              className="text-sm font-medium hover:text-blue-700"
-            >
-              Login
-            </a>
+        {/* 2. Patient Portal */}
+        <Route path="/patient" element={<PatientLayout />}>
+          <Route index element={<Navigate to="/patient/dashboard" replace />} />
+          <Route path="dashboard" element={<PatientDashboardPage />} />
+          <Route path="prescriptions" element={<PatientPrescriptionsPage />} />
+          <Route path="family" element={<PatientFamilyPage />} />
+          <Route path="consents" element={<PatientConsentsPage />} />
+        </Route>
 
-            <a
-              href="/register"
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-            >
-              Get Started
-            </a>
-          </div>
-        </nav>
-      </header>
+        {/* 3. Clinic Staff Portal */}
+        <Route path="/staff" element={<StaffLayout />}>
+          {/* Reception */}
+          <Route path="reception" element={<ReceptionQueuePage />} />
+          <Route path="reception/enquiries" element={<ReceptionEnquiriesPage />} />
+          <Route path="reception/all-appointments" element={<ReceptionQueuePage />} />
 
-      <section className="mx-auto flex max-w-7xl flex-col items-center px-6 py-24 text-center">
-        <span className="rounded-full bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700">
-          Healthcare made simpler
-        </span>
+          {/* Doctor */}
+          <Route path="doctor" element={<DoctorQueuePage />} />
+          <Route path="doctor/schedule" element={<DoctorSchedulePage />} />
 
-        <h1 className="mt-6 max-w-3xl text-4xl font-bold tracking-tight sm:text-6xl">
-          Find the right doctor.
-          <span className="block text-blue-600">Book with confidence.</span>
-        </h1>
+          {/* Clinic Admin */}
+          <Route path="admin" element={<ClinicAdminDashboardPage />} />
+          <Route path="admin/catalog" element={<ClinicAdminCatalogPage />} />
+          <Route path="admin/cms" element={<ClinicAdminCMSPage />} />
+          <Route path="admin/settings" element={<ClinicAdminSettingsPage />} />
+          <Route path="admin/staff" element={<ClinicAdminStaffPage />} />
+        </Route>
 
-        <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-          Discover doctors, explore available appointments, and manage your
-          healthcare bookings in one place.
-        </p>
+        {/* 4. Super Admin Console */}
+        <Route path="/super-admin" element={<SuperAdminLayout />}>
+          <Route index element={<SuperAdminClinicsPage />} />
+          <Route path="analytics" element={<SuperAdminAnalyticsPage />} />
+          <Route path="plans" element={<SuperAdminPlansPage />} />
+        </Route>
 
-        <div className="mt-8 flex flex-wrap justify-center gap-4">
-          <a
-            href="/doctors"
-            className="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700"
-          >
-            Find a Doctor
-          </a>
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
 
-          <a
-            href="/register"
-            className="rounded-lg border border-slate-300 bg-white px-6 py-3 font-semibold hover:bg-slate-100"
-          >
-            Create Account
-          </a>
-        </div>
-
-        <div className="mt-12 rounded-xl border border-slate-200 bg-white px-6 py-4 text-left shadow-sm">
-          <p className="font-semibold">Backend connection</p>
-
-          {healthQuery.isPending && (
-            <p className="mt-2 text-sm text-slate-500">
-              Checking API status...
-            </p>
-          )}
-
-          {healthQuery.isSuccess && (
-            <div className="mt-2 text-sm">
-              <p className="text-green-700">{healthQuery.data.message}</p>
-
-              <p className="mt-1 text-slate-500">
-                Database: {healthQuery.data.data.database}
-              </p>
-            </div>
-          )}
-
-          {healthQuery.isError && (
-            <p className="mt-2 text-sm text-red-600">
-              Unable to connect to the backend.
-            </p>
-          )}
-        </div>
-      </section>
-    </main>
+      {/* Floating Demo Role & Tenant Switcher */}
+      <DevToolbar />
+    </BrowserRouter>
   );
 }
-
-export default App;
