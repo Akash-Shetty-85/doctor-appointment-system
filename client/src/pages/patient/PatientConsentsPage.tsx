@@ -16,6 +16,7 @@ export const PatientConsentsPage: React.FC = () => {
   }, []);
 
   const activeUser = mockStore.getActiveUser();
+  if (!activeUser) return null;
 
   const handleSaveConsents = () => {
     activeUser.consents = {

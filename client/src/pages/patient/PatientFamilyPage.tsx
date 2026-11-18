@@ -22,6 +22,8 @@ export const PatientFamilyPage: React.FC = () => {
   }, []);
 
   const activeUser = mockStore.getActiveUser();
+  if (!activeUser) return null;
+
   const familyMembers = activeUser.familyMembers || [];
 
   const handleAddMember = (e: React.FormEvent) => {

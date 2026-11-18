@@ -54,8 +54,8 @@ export const BookingPage: React.FC = () => {
 
   // Patient Info
   const [forWhom, setForWhom] = useState<'Self' | string>('Self');
-  const [patientName, setPatientName] = useState(activeUser.name || '');
-  const [patientPhone, setPatientPhone] = useState(activeUser.phone || '');
+  const [patientName, setPatientName] = useState(activeUser?.name || '');
+  const [patientPhone, setPatientPhone] = useState(activeUser?.phone || '');
   const [patientNotes, setPatientNotes] = useState('');
 
   // Confirmed booking result
@@ -112,9 +112,9 @@ export const BookingPage: React.FC = () => {
 
     const apt = mockStore.createAppointment({
       branchId: selectedBranchId,
-      patientId: activeUser.id,
-      patientName: patientName || activeUser.name,
-      patientPhone: patientPhone || activeUser.phone,
+      patientId: activeUser?.id || 'usr-guest-' + Date.now().toString(36),
+      patientName: patientName || activeUser?.name || 'Guest Patient',
+      patientPhone: patientPhone || activeUser?.phone || '',
       forWhom: forWhom,
       doctorId: selectedDoctorId,
       serviceId: selectedServiceId,
@@ -425,7 +425,7 @@ export const BookingPage: React.FC = () => {
                 type="button"
                 onClick={() => {
                   setForWhom('Self');
-                  setPatientName(activeUser.name);
+                  setPatientName(activeUser?.name || '');
                 }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${
                   forWhom === 'Self'
@@ -433,9 +433,9 @@ export const BookingPage: React.FC = () => {
                     : 'bg-white text-slate-700 border-slate-300'
                 }`}
               >
-                Self ({activeUser.name})
+                Self ({activeUser?.name || 'Guest'})
               </button>
-              {activeUser.familyMembers?.map((fam) => (
+              {activeUser?.familyMembers?.map((fam) => (
                 <button
                   key={fam.id}
                   type="button"

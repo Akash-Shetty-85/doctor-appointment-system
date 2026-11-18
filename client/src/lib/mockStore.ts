@@ -40,7 +40,7 @@ interface MockStoreState {
   enquiries: Enquiry[];
   slotLocks: SlotLock[];
   activeClinicId: string;
-  activeUserId: string;
+  activeUserId: string | null;
 }
 
 function getInitialState(): MockStoreState {
@@ -128,22 +128,28 @@ class MockStore {
   }
 
   // --- Auth / User State ---
-  public getActiveUser(): User {
+  public getActiveUser(): User | null {
+    if (!this.state.activeUserId) return null;
     return (
-      this.state.users.find((u) => u.id === this.state.activeUserId) ||
-      this.state.users[0]
+      this.state.users.find((u) => u.id === this.state.activeUserId) || null
     );
   }
 
-  public getActiveRole(): Role {
+  public getActiveRole(): Role | null {
     const user = this.getActiveUser();
+    if (!user) return null;
     const membership = user.memberships.find(
       (m) => m.clinicId === '*' || m.clinicId === this.state.activeClinicId
     );
     return membership?.role || 'PATIENT';
   }
 
-  public setActiveUser(userId: string) {
+  public logout() {
+    this.state.activeUserId = null;
+    this.persist();
+  }
+
+  public setActiveUser(userId: string | null) {
     this.state.activeUserId = userId;
     this.persist();
   }

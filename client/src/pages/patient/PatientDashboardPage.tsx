@@ -36,6 +36,8 @@ export const PatientDashboardPage: React.FC = () => {
   }, []);
 
   const activeUser = mockStore.getActiveUser();
+  if (!activeUser) return null;
+
   const appointments = mockStore.getAppointments({ patientId: activeUser.id });
 
   const todayStr = new Date().toISOString().split('T')[0];

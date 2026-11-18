@@ -9,6 +9,7 @@ import { SuperAdminLayout } from './layouts/SuperAdminLayout';
 
 // Common
 import { DevToolbar } from './components/common/DevToolbar';
+import { ProtectedRoute } from './components/common/ProtectedRoute';
 
 // Public Pages
 import { HomePage } from './pages/public/HomePage';
@@ -19,6 +20,7 @@ import { AboutPage } from './pages/public/AboutPage';
 import { FAQPage } from './pages/public/FAQPage';
 import { BlogPage } from './pages/public/BlogPage';
 import { BookingPage } from './pages/public/BookingPage';
+import { LoginPage } from './pages/public/LoginPage';
 
 // Patient Pages
 import { PatientDashboardPage } from './pages/patient/PatientDashboardPage';
@@ -55,42 +57,53 @@ export default function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/faq" element={<FAQPage />} />
           <Route path="/blog" element={<BlogPage />} />
-          <Route path="/book" element={<BookingPage />} />
+          {/* <Route path="/book" element={<BookingPage />} /> */}
+          <Route path="/login" element={<LoginPage />} />
         </Route>
 
-        {/* 2. Patient Portal */}
-        <Route path="/patient" element={<PatientLayout />}>
-          <Route index element={<Navigate to="/patient/dashboard" replace />} />
-          <Route path="dashboard" element={<PatientDashboardPage />} />
-          <Route path="prescriptions" element={<PatientPrescriptionsPage />} />
-          <Route path="family" element={<PatientFamilyPage />} />
-          <Route path="consents" element={<PatientConsentsPage />} />
+        {/* 2. Patient Portal (Protected for PATIENT role) */}
+        <Route element={<ProtectedRoute allowedRoles={['PATIENT']} />}>
+          <Route path="/patient" element={<PatientLayout />}>
+            <Route index element={<Navigate to="/patient/dashboard" replace />} />
+            <Route path="dashboard" element={<PatientDashboardPage />} />
+            <Route path="prescriptions" element={<PatientPrescriptionsPage />} />
+            <Route path="family" element={<PatientFamilyPage />} />
+            <Route path="consents" element={<PatientConsentsPage />} />
+          </Route>
         </Route>
 
         {/* 3. Clinic Staff Portal */}
         <Route path="/staff" element={<StaffLayout />}>
-          {/* Reception */}
-          <Route path="reception" element={<ReceptionQueuePage />} />
-          <Route path="reception/enquiries" element={<ReceptionEnquiriesPage />} />
-          <Route path="reception/all-appointments" element={<ReceptionQueuePage />} />
+          {/* Reception Workspace (RECEPTIONIST or CLINIC_ADMIN) */}
+          <Route element={<ProtectedRoute allowedRoles={['RECEPTIONIST', 'CLINIC_ADMIN']} />}>
+            <Route path="reception" element={<ReceptionQueuePage />} />
+            <Route path="reception/enquiries" element={<ReceptionEnquiriesPage />} />
+            <Route path="reception/all-appointments" element={<ReceptionQueuePage />} />
+          </Route>
 
-          {/* Doctor */}
-          <Route path="doctor" element={<DoctorQueuePage />} />
-          <Route path="doctor/schedule" element={<DoctorSchedulePage />} />
+          {/* Doctor Workspace (DOCTOR) */}
+          <Route element={<ProtectedRoute allowedRoles={['DOCTOR', 'CLINIC_ADMIN']} />}>
+            <Route path="doctor" element={<DoctorQueuePage />} />
+            <Route path="doctor/schedule" element={<DoctorSchedulePage />} />
+          </Route>
 
-          {/* Clinic Admin */}
-          <Route path="admin" element={<ClinicAdminDashboardPage />} />
-          <Route path="admin/catalog" element={<ClinicAdminCatalogPage />} />
-          <Route path="admin/cms" element={<ClinicAdminCMSPage />} />
-          <Route path="admin/settings" element={<ClinicAdminSettingsPage />} />
-          <Route path="admin/staff" element={<ClinicAdminStaffPage />} />
+          {/* Clinic Admin Workspace (CLINIC_ADMIN) */}
+          <Route element={<ProtectedRoute allowedRoles={['CLINIC_ADMIN']} />}>
+            <Route path="admin" element={<ClinicAdminDashboardPage />} />
+            <Route path="admin/catalog" element={<ClinicAdminCatalogPage />} />
+            <Route path="admin/cms" element={<ClinicAdminCMSPage />} />
+            <Route path="admin/settings" element={<ClinicAdminSettingsPage />} />
+            <Route path="admin/staff" element={<ClinicAdminStaffPage />} />
+          </Route>
         </Route>
 
-        {/* 4. Super Admin Console */}
-        <Route path="/super-admin" element={<SuperAdminLayout />}>
-          <Route index element={<SuperAdminClinicsPage />} />
-          <Route path="analytics" element={<SuperAdminAnalyticsPage />} />
-          <Route path="plans" element={<SuperAdminPlansPage />} />
+        {/* 4. Super Admin Console (SUPER_ADMIN only) */}
+        <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']} />}>
+          <Route path="/super-admin" element={<SuperAdminLayout />}>
+            <Route index element={<SuperAdminClinicsPage />} />
+            <Route path="analytics" element={<SuperAdminAnalyticsPage />} />
+            <Route path="plans" element={<SuperAdminPlansPage />} />
+          </Route>
         </Route>
 
         {/* Fallback */}

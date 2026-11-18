@@ -24,6 +24,8 @@ export const PatientPrescriptionsPage: React.FC = () => {
   }, []);
 
   const activeUser = mockStore.getActiveUser();
+  if (!activeUser) return null;
+
   const clinic = mockStore.getActiveClinic();
   const consultations = mockStore.getConsultationsByPatient(activeUser.id);
   const doctors = mockStore.getDoctors();

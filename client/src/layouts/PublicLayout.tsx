@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { mockStore } from '../lib/mockStore';
 import {
   Phone,
@@ -13,6 +13,7 @@ import {
   ShieldAlert,
   ChevronRight,
   User,
+  LogOut,
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
@@ -20,14 +21,38 @@ export const PublicLayout: React.FC = () => {
   const [, setTick] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     return mockStore.subscribe(() => setTick((t) => t + 1));
   }, []);
 
   const clinic = mockStore.getActiveClinic();
+  const activeUser = mockStore.getActiveUser();
+  const activeRole = mockStore.getActiveRole();
   const branding = clinic.branding;
   const settings = clinic.settings;
+
+  const handleLogout = () => {
+    mockStore.logout();
+    navigate('/');
+  };
+
+  const getPortalPath = () => {
+    if (activeRole === 'RECEPTIONIST') return '/staff/reception';
+    if (activeRole === 'DOCTOR') return '/staff/doctor';
+    if (activeRole === 'CLINIC_ADMIN') return '/staff/admin';
+    if (activeRole === 'SUPER_ADMIN') return '/super-admin';
+    return '/patient/dashboard';
+  };
+
+  // If a role is actively logged in, they are redirected to their portal.
+  // They must first logout to browse the public website.
+  useEffect(() => {
+    if (activeUser && activeRole && location.pathname !== '/book') {
+      navigate(getPortalPath(), { replace: true });
+    }
+  }, [activeUser, activeRole, location.pathname]);
 
   const navLinks = [
     { label: 'Home', path: '/' },
@@ -82,13 +107,30 @@ export const PublicLayout: React.FC = () => {
                 ))}
               </select>
             </div>
-            <Link
-              to="/patient/dashboard"
-              className="flex items-center gap-1 text-sky-400 hover:text-sky-300 font-medium transition-colors"
-            >
-              <User className="h-3.5 w-3.5" />
-              <span>Patient Portal</span>
-            </Link>
+
+            {activeUser ? (
+              <div className="flex items-center gap-3 pl-2 border-l border-slate-700">
+                <span className="text-slate-300">
+                  Hi, <strong className="text-white">{activeUser.name}</strong> ({activeRole})
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-1 text-rose-400 hover:text-rose-300 font-semibold transition-colors"
+                  title="Logout"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="flex items-center gap-1 text-sky-400 hover:text-sky-300 font-medium transition-colors"
+              >
+                <User className="h-3.5 w-3.5" />
+                <span>Portal Login</span>
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -133,12 +175,35 @@ export const PublicLayout: React.FC = () => {
 
           {/* Action CTAs */}
           <div className="hidden sm:flex items-center gap-3">
-            <Link to="/book">
-              <Button size="md" className="bg-sky-600 hover:bg-sky-700 shadow-sm">
-                <Calendar className="h-4 w-4 mr-1.5" />
-                Book Appointment
-              </Button>
-            </Link>
+            {activeUser ? (
+              <>
+                <Link to={getPortalPath()}>
+                  <Button variant="outline" size="md" className="border-sky-300 text-sky-700 hover:bg-sky-50">
+                    Open {activeRole === 'PATIENT' ? 'Patient Portal' : 'Workspace'}
+                  </Button>
+                </Link>
+                <Link to="/book">
+                  <Button size="md" className="bg-sky-600 hover:bg-sky-700 shadow-sm">
+                    <Calendar className="h-4 w-4 mr-1.5" />
+                    Book Appointment
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="outline" size="md">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/book">
+                  <Button size="md" className="bg-sky-600 hover:bg-sky-700 shadow-sm">
+                    <Calendar className="h-4 w-4 mr-1.5" />
+                    Book Appointment
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu trigger */}
@@ -170,11 +235,32 @@ export const PublicLayout: React.FC = () => {
                   Book Appointment
                 </Button>
               </Link>
-              <Link to="/patient/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="outline" className="w-full">
-                  Patient Portal
-                </Button>
-              </Link>
+              {activeUser ? (
+                <>
+                  <Link to={getPortalPath()} onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full">
+                      Open {activeRole === 'PATIENT' ? 'Patient Portal' : 'Workspace'}
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      handleLogout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full text-rose-600"
+                  >
+                    <LogOut className="h-4 w-4 mr-1.5" />
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full">
+                    Sign In
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         )}

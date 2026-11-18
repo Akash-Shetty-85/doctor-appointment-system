@@ -7,10 +7,7 @@ import {
   Users,
   ShieldCheck,
   PlusCircle,
-  ArrowLeft,
-  User,
   LogOut,
-  Building2,
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
@@ -26,6 +23,11 @@ export const PatientLayout: React.FC = () => {
   const clinic = mockStore.getActiveClinic();
   const user = mockStore.getActiveUser();
 
+  const handleLogout = () => {
+    mockStore.logout();
+    navigate('/');
+  };
+
   const navItems = [
     { label: 'My Appointments', path: '/patient/dashboard', icon: Calendar },
     { label: 'Prescriptions & Records', path: '/patient/prescriptions', icon: FileText },
@@ -33,26 +35,27 @@ export const PatientLayout: React.FC = () => {
     { label: 'Privacy & Consents', path: '/patient/consents', icon: ShieldCheck },
   ];
 
+  if (!user) return null;
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       {/* Patient Portal Top Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link to="/" className="flex items-center gap-2 text-slate-500 hover:text-slate-800 text-xs font-medium">
-              <ArrowLeft className="h-4 w-4" />
-              <span>Back to Clinic Site</span>
-            </Link>
-            <div className="h-4 w-px bg-slate-200 hidden sm:block" />
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-slate-900 text-sm">{clinic.name}</span>
-              <span className="bg-sky-50 text-sky-700 text-xs px-2 py-0.5 rounded-full font-medium">
-                Patient Portal
+          {/* Clinic Brand Identity (No direct link to public site) */}
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-sky-600 to-cyan-500 flex items-center justify-center text-white font-bold text-base shadow-xs">
+              {clinic.name.charAt(0)}
+            </div>
+            <div>
+              <span className="font-bold text-slate-900 text-sm block leading-tight">{clinic.name}</span>
+              <span className="text-[11px] text-sky-700 font-semibold">
+                Patient Care Portal
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <Link to="/book">
               <Button size="sm" className="bg-sky-600 hover:bg-sky-700 text-xs">
                 <PlusCircle className="h-3.5 w-3.5 mr-1" />
@@ -68,6 +71,16 @@ export const PatientLayout: React.FC = () => {
                 <p className="text-xs font-semibold text-slate-800 leading-tight">{user.name}</p>
                 <p className="text-[11px] text-slate-500">{user.phone}</p>
               </div>
+
+              {/* Logout is the only exit to the public site */}
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1.5 p-1.5 px-2.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition-colors ml-1 text-xs font-semibold"
+                title="Logout to view Public Site"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Logout</span>
+              </button>
             </div>
           </div>
         </div>

@@ -29,7 +29,7 @@ export const mockApi = {
   },
 
   // Auth & Session
-  getMe: async (): Promise<{ user: User; role: string; clinic: Clinic }> => {
+  getMe: async (): Promise<{ user: User | null; role: string | null; clinic: Clinic }> => {
     await delay(100);
     return {
       user: mockStore.getActiveUser(),

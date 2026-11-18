@@ -6,16 +6,12 @@ import {
   Calendar,
   Clock,
   Settings,
-  FileText,
-  UserCheck,
   Stethoscope,
   BarChart3,
-  Layers,
   Inbox,
-  ArrowLeft,
-  Building,
-  Shield,
   Palette,
+  LogOut,
+  Building2,
 } from 'lucide-react';
 import { Badge } from '../components/ui/Badge';
 
@@ -31,6 +27,11 @@ export const StaffLayout: React.FC = () => {
   const clinic = mockStore.getActiveClinic();
   const user = mockStore.getActiveUser();
   const role = mockStore.getActiveRole();
+
+  const handleLogout = () => {
+    mockStore.logout();
+    navigate('/');
+  };
 
   // Role-based Nav Configuration
   const getNavItems = () => {
@@ -57,6 +58,8 @@ export const StaffLayout: React.FC = () => {
     ];
   };
 
+  if (!user || !role) return null;
+
   const navItems = getNavItems();
 
   return (
@@ -64,19 +67,15 @@ export const StaffLayout: React.FC = () => {
       {/* Top Header */}
       <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link
-              to="/"
-              className="text-slate-400 hover:text-white text-xs flex items-center gap-1 font-medium transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span>Public Site</span>
-            </Link>
-            <div className="h-4 w-px bg-slate-700 hidden sm:block" />
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-white text-sm">{clinic.name}</span>
-              <span className="text-slate-400 text-xs hidden md:inline">
-                ({clinic.branches[0]?.name})
+          {/* Clinic Brand Identity (No direct link to public site) */}
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-sky-400 font-bold text-base shadow-xs">
+              <Building2 className="h-5 w-5" />
+            </div>
+            <div>
+              <span className="font-bold text-white text-sm block leading-tight">{clinic.name}</span>
+              <span className="text-slate-400 text-xs">
+                {clinic.branches[0]?.name} • Staff Workspace
               </span>
             </div>
           </div>
@@ -94,6 +93,16 @@ export const StaffLayout: React.FC = () => {
                 <p className="text-xs font-semibold text-white leading-tight">{user.name}</p>
                 <p className="text-[10px] text-slate-400">{user.email || user.phone}</p>
               </div>
+
+              {/* Logout is the only exit to the public site */}
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1.5 p-1.5 px-2.5 rounded-lg text-slate-300 hover:text-rose-400 hover:bg-slate-800 border border-slate-700 hover:border-rose-900/60 transition-colors ml-1 text-xs font-semibold"
+                title="Logout to view Public Site"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Logout</span>
+              </button>
             </div>
           </div>
         </div>
