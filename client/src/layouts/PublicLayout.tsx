@@ -161,11 +161,10 @@ export const PublicLayout: React.FC = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'text-sky-600 font-semibold'
-                      : 'text-slate-600 hover:text-sky-600'
-                  }`}
+                  className={`text-sm font-medium transition-colors ${isActive
+                    ? 'text-sky-600 font-semibold'
+                    : 'text-slate-600 hover:text-sky-600'
+                    }`}
                 >
                   {link.label}
                 </Link>
@@ -182,24 +181,12 @@ export const PublicLayout: React.FC = () => {
                     Open {activeRole === 'PATIENT' ? 'Patient Portal' : 'Workspace'}
                   </Button>
                 </Link>
-                <Link to="/book">
-                  <Button size="md" className="bg-sky-600 hover:bg-sky-700 shadow-sm">
-                    <Calendar className="h-4 w-4 mr-1.5" />
-                    Book Appointment
-                  </Button>
-                </Link>
               </>
             ) : (
               <>
                 <Link to="/login">
                   <Button variant="outline" size="md">
                     Sign In
-                  </Button>
-                </Link>
-                <Link to="/book">
-                  <Button size="md" className="bg-sky-600 hover:bg-sky-700 shadow-sm">
-                    <Calendar className="h-4 w-4 mr-1.5" />
-                    Book Appointment
                   </Button>
                 </Link>
               </>

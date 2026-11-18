@@ -41,7 +41,7 @@ export const DevToolbar: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 font-sans">
+    <div className="fixed bottom-4 left-4 z-50 font-sans">
       {!isOpen ? (
         <button
           onClick={() => setIsOpen(true)}
@@ -131,11 +131,10 @@ export const DevToolbar: React.FC = () => {
                       mockStore.switchRole(r.role);
                       navigate(r.route);
                     }}
-                    className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left transition-colors ${
-                      isSelected
+                    className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left transition-colors ${isSelected
                         ? 'bg-sky-600 text-white font-semibold'
                         : 'bg-slate-800/80 hover:bg-slate-800 text-slate-200'
-                    }`}
+                      }`}
                   >
                     <span>{r.label}</span>
                     {isSelected && <span className="text-[10px] opacity-75">Active</span>}
